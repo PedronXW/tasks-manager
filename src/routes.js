@@ -9,8 +9,15 @@ export const routes = [
         path:buildRoutePath("/tasks"),
         handler:(req, res) => {
             const {title, description} = req.body;
+
+            if(!title || !description){
+                return res.writeHead(400).end(JSON.stringify({
+                    error: "Title and description are required"
+                }));
+            }
+
             database.insert(title, description);
-            res.writeHead(201).end();
+            return res.writeHead(201).end();
         }
     },
     {
@@ -19,7 +26,7 @@ export const routes = [
         handler:(req, res) => {
             const {search} = req.query;
             const data = database.select(search);
-            res.writeHead(200, {
+            return res.writeHead(200, {
                 'Content-Type': 'application/json'
             }).end(JSON.stringify(data));
         }
@@ -30,8 +37,15 @@ export const routes = [
         handler:(req, res) => {
             const {id} = req.params;
             const {title, description} = req.body;
-            database.change(id, title, description);
-            res.writeHead(204).end();
+            try{
+                database.change(id, title, description);
+            }catch(err){
+                return res.writeHead(404).end(JSON.stringify({
+                    error: err.message
+                }));
+            }
+            
+            return res.writeHead(204).end();
         },
     },
     {
@@ -39,8 +53,14 @@ export const routes = [
         path:buildRoutePath("/tasks/:id/complete"),
         handler:(req, res) => {
             const {id} = req.params;
-            database.complete(id);
-            res.writeHead(204).end();
+            try{
+                database.complete(id);
+            }catch(err){
+                return res.writeHead(404).end(JSON.stringify({
+                    error: err.message
+                }));
+            }
+            return res.writeHead(204).end();
         }
     },
     {
@@ -48,8 +68,14 @@ export const routes = [
         path:buildRoutePath("/tasks/:id"),
         handler:(req, res) => {
             const {id} = req.params;
-            database.remove(id);
-            res.writeHead(204).end();
+            try{
+                database.remove(id);
+            }catch(err){
+                return res.writeHead(404).end(JSON.stringify({
+                    error: err.message
+                }));
+            }
+            return res.writeHead(204).end();
         }
     }
 ]

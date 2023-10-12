@@ -1,12 +1,7 @@
 import http from 'http';
 import { json } from './middlewares/json.js';
 import { routes } from './routes.js';
-import { csvImport } from './utils/csvImport.js';
 import { getQueryParams } from './utils/getQueryParams.js';
-
-const csvPath = new URL('./tasks.csv', import.meta.url);
-
-csvImport(csvPath);
 
 const server = http.createServer(async (req, res) => {
 

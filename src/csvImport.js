@@ -1,15 +1,15 @@
 import { parse } from 'csv-parse';
 import fs from 'node:fs';
 
-
 const csvParse = parse({
     delimiter: ',',
     skipEmptyLines: true,
     fromLine: 2
 });
 
+const csvPath = new URL('./tasks.csv', import.meta.url);
+
 async function csvImport(path) {
-    console.log('Importing CSV...');
     const stream = fs.createReadStream(path);
 
     const linesParse = stream.pipe(csvParse);
@@ -29,5 +29,7 @@ async function csvImport(path) {
         })
     }
 }
+
+csvImport(csvPath);
 
 export { csvImport };

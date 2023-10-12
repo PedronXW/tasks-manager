@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import fs from 'fs/promises';
 
 const databasePath = new URL('./database.json', import.meta.url);
@@ -8,6 +9,7 @@ export class Database {
     constructor() {
         fs.readFile(databasePath).then((data) => {
             this.#database = JSON.parse(data);
+            this.#persist();
         }).catch(err => {
             this.#persist();
         })
@@ -31,6 +33,7 @@ export class Database {
 
     insert(title, description) {
         let data = {
+            id: randomUUID(),
             title,
             description,
             created_at: new Date(),
@@ -39,6 +42,8 @@ export class Database {
         };
 
         this.#database.push(data);
+
+        this.#persist();
     }
 
     change(id, title, description) {
@@ -49,6 +54,8 @@ export class Database {
             data.description = description ?? data.description;
             data.updated_at = new Date();
             this.#persist();
+        }else{
+            throw new Error("Task not found");
         }
     }
 
@@ -56,8 +63,10 @@ export class Database {
         let data = this.#database.find((task) => task.id === id);
 
         if (data) {
-            data.completed = new Date();
+            data.completed_at = new Date();
             this.#persist();
+        }else{
+            throw new Error("Task not found");
         }
     }
 
@@ -67,6 +76,8 @@ export class Database {
         if (data) {
             this.#database = this.#database.filter((task) => task.id !== id);
             this.#persist();
+        }else{
+            throw new Error("Task not found");
         }
     }
 
